@@ -1,3 +1,7 @@
+/* eslint-disable react/self-closing-comp */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react/jsx-no-undef */
+/* eslint-disable react-native/no-inline-styles */
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
@@ -5,114 +9,91 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+import React, {useState} from 'react';
+import {Button, SafeAreaView, Text, View} from 'react-native';
+import {styles} from './style';
+import Slider from '@react-native-community/slider';
+import Modal from 'react-native-modal'; // react-native-modal bileşenini içe aktarın
 
 function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const [weight, setWeight] = useState(0);
+  const [height, setHeight] = useState(0);
+  const [indeks, setIndeks] = useState(0);
+  const [isModalVisible, setModalVisible] = useState(false);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+  const handleWeightChange = (value: any) => {
+    setWeight(value);
+  };
+  const handleHeightChange = (value: any) => {
+    setHeight(value);
   };
 
+  const calcIndeks = () => {
+    const indeks = weight / Math.pow(height / 100, 2);
+
+    setIndeks(indeks);
+    toggleModal(); // Modal'ı aç
+  };
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and tshen come back to sees your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <SafeAreaView>
+      <View style={styles.title_c}>
+        <Text style={styles.title_f}>Vücut Kitle İndeksi</Text>
+      </View>
+      <Text style={styles.label}>Kilo</Text>
+
+      <View style={styles.slider_c}>
+        <Slider
+          style={styles.slider_w}
+          // value={100}
+          maximumValue={120}
+          minimumValue={0}
+          step={0.1}
+          onValueChange={(value: number) => setWeight(value)}
+        />
+        <Text>{weight.toFixed(2)}</Text>
+      </View>
+      <Text style={styles.label}>Boy</Text>
+      <View style={styles.slider_c}>
+        <Slider
+          style={styles.slider_w}
+          // value={100}
+          maximumValue={240}
+          minimumValue={0}
+          step={0.1}
+          onValueChange={(value: number) => setHeight(value)}
+        />
+        <Text>{height.toFixed(1)}</Text>
+      </View>
+
+      <View style={styles.title_c}>
+        <Button
+          onPress={calcIndeks}
+          title="Hesapla"
+          color="#841584"
+          accessibilityLabel="Learn more about this purple button"
+        />
+      </View>
+
+      <Modal
+        style={{
+          justifyContent: 'flex-end', // Alt kısmı kaplamak için alttan başlaması
+          margin: 0, // Modalın ekranın tamamını kaplamasını sağlar
+        }}
+        onBackdropPress={toggleModal}
+        isVisible={isModalVisible}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>Vücut Kitle İndeksi</Text>
+          <Text style={styles.modalText}>
+            İndeks Sonucu: {indeks.toFixed(1)}
+          </Text>
+          <Button title="Kapat" onPress={toggleModal} />
         </View>
-      </ScrollView>
+      </Modal>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
